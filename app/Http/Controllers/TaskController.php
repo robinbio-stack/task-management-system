@@ -9,15 +9,28 @@ use Illuminate\Support\Facades\Auth;
 
 class TaskController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
 
-        if ($user->role === 'admin') {
-            $tasks = Task::with('assignedUser')->get();
-        } else {
-            $tasks = Task::with('assignedUser')->where('assigned_to', $user->id)->get();
+        // Start query (do NOT call get() yet)
+        $query = Task::with('assignedUser');
+
+        // Admin sees all tasks, user sees only their tasks
+        if ($user->role !== 'admin') {
+            $query->where('assigned_to', $user->id);
         }
+
+        // Apply filters if provided
+        if ($request->status) {
+            $query->where('status', $request->status);
+        }
+        if ($request->due_date) {
+            $query->whereDate('due_date', $request->due_date);
+        }
+
+        // Paginate results (10 per page)
+        $tasks = $query->latest()->paginate(10)->withQueryString();
 
         return view('tasks.index', compact('tasks'));
     }
