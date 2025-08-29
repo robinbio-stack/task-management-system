@@ -39,10 +39,7 @@
         <h4 class="mb-4">Task Manager</h4>
         <a href="{{ route('dashboard') }}">🏠 Dashboard</a>
         <a href="{{ route('tasks.index') }}">📝 Tasks</a>
-        <a href="#">👤 Profile</a>
-        @if(Auth::user()->role === 'admin')
-            <a href="{{ url('/admin-only') }}">⚙️ Admin Panel</a>
-        @endif
+       
         <form action="{{ route('logout') }}" method="POST" class="mt-3">
             @csrf
             <button type="submit" class="btn btn-danger w-100">🚪 Logout</button>
